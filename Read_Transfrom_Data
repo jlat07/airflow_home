@@ -1,0 +1,34 @@
+import pandas as pd
+import os
+import csv 
+
+
+'''
+Load CSV
+'''
+data = pd.read_csv('/Users/jthompson/dev/airflow_home/data/oura_2019_trends.csv')
+
+data2 = pd.read_csv('/Users/jthompson/dev/airflow_home/data/oura_2019-09-17_2020-04-01_trends.csv')
+
+data3 = pd.read_csv('/Users/jthompson/dev/airflow_home/data/debits.csv')
+
+'''
+Convert to DataFrames
+'''
+df = pd.DataFrame(data)
+
+df2 = pd.DataFrame(data2)
+
+df3 = pd.DataFrame(data3)
+
+'''
+Set date to datetime64
+'''
+df2['date'] = pd.to_datetime(df3['Date'])
+
+df3 = df3.drop(columns=['Running Bal.'])
+
+df3['Date'] = df3['Date'].str.replace("/","-")
+
+df3 = pd.to_datetime(df3['Date'])
+
