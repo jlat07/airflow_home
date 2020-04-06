@@ -1,16 +1,33 @@
-'''
-import csv
-import os
-import numpy as np
-import pandas as pd
-import psycopg2
-import airflow
+from airflow.operators.postgres_operator import PostgresOperatorimport uuid
+from airflow.utils.trigger_rule import TriggerRule
 from airflow import DAG
-from airflow.operators.postgres_operator import PostgresOperator
-from airflow.operators.bash_operator import BashOperator
-from airflow.operators.python_operator import PythonOperator
-from datetime import timedelta, datetime
+from datetime import datetime
 
+
+dag_params = {
+    'dag_id': 'PostgresOperator_dag',
+    'start_date': datetime.now(),
+    'schedule_interval': None
+}
+
+
+with DAG(**dag_params) as dag:
+
+    create_table = PostgresOperator(
+        task_id='create_table',
+        sql='''CREATE TABLE new_table(
+            custom_id integer NOT NULL, timestamp TIMESTAMP NOT NULL, user_id VARCHAR (50) NOT NULL
+            );''',
+    )
+
+    insert_row = PostgresOperator(
+        task_id='insert_row',
+        sql='INSERT INTO new_table VALUES(%s, %s, %s)',
+        trigger_rule=TriggerRule.ALL_DONE,
+        parameters=(uuid.uuid4().int % 123456789, datetime.now(), uuid.uuid4().hex[:10])
+    )
+
+    create_table >> insert_row
 
 default_args = {
     'owner': 'JLAT',
@@ -212,4 +229,3 @@ t3 = PythonOperator(
 t1
 
 t2 >> t3
-'''
