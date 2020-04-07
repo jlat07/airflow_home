@@ -1,5 +1,7 @@
 from datetime import timedelta, datetime
+from sqlalchemy import create_engine
 import urllib.request
+import pandas as pd
 import json
 
 
@@ -60,3 +62,9 @@ def get_readiness_data():
         
         with open(file_name, 'w') as handler:
             json.dump(data, handler)
+        
+
+if __name__ == "__main__":
+    get_sleep_data()
+    get_activity_data()
+    get_readiness_data()    

@@ -1,7 +1,9 @@
 from airflow.operators.python_operator import PythonOperator
 from airflow.models import DAG
 from datetime import timedelta, datetime
+from sqlalchemy import create_engine
 import urllib.request
+import pandas as pd
 import json
 
 
@@ -100,4 +102,38 @@ t3 = PythonOperator(
     )
 
 
-t1 >> t2 >> t3 
+def update_db():
+    
+    '''
+    Sleep data
+    '''
+    
+    engine = create_engine('mysql+pymysql://root:yourpassword@localhost:3306/airflow_project')
+    df = pd.read_json('Users/jthompson/dev/airflow_home/data/sleep_data.json', delimiter=',')
+    df.to_sql(name='Oura_Data', con=engine, schema='airflow_project', if_exists='replace')
+    
+    '''
+    Activity Data
+    '''
+    
+    engine = create_engine('mysql+pymysql://root:yourpassword@localhost:3306/airflow_project')
+    df = pd.read_json('Users/jthompson/dev/airflow_home/data/sleep_data.json', delimiter=',')
+    df.to_sql(name='Oura_Data', con=engine, schema='airflow_project', if_exists='replace')
+    
+    '''
+    Readiness Data
+    '''
+    
+    engine = create_engine('mysql+pymysql://root:yourpassword@localhost:3306/airflow_project')
+    df = pd.read_json('Users/jthompson/dev/airflow_home/data/sleep_data.json', delimiter=',')
+    df.to_sql(name='Oura_Data', con=engine, schema='airflow_project', if_exists='replace')
+    
+
+t4 = PythonOperator(
+    task_id='update_db',
+    python_callable=update_db,
+    dag=dag,
+)
+
+
+[t1, t2, t3] >> t4
