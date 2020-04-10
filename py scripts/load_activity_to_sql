@@ -1,0 +1,34 @@
+from datetime import timedelta, datetime
+from sqlalchemy import create_engine
+from pandas.io.json import json_normalize
+import pandas as pd
+import json
+import os
+
+
+env = os.environ.get(mySQLpw)
+
+def update_db():
+
+    '''
+    Activity Data
+    '''
+    
+    data6_1 = pd.read_json('/Users/jthompson/dev/airflow_home/data/activity_data.json')
+
+    data6_1 = json_normalize(data6_1['activity'])
+
+    data6_1 = data6_1.drop(columns=['met_1min'])
+
+    data6_1['day_start'] = pd.to_datetime(data6_1['day_start'])
+
+    data6_1['day_end'] = pd.to_datetime(data6_1['day_end'])
+
+    data6_1['summary_date'] = pd.to_datetime(data6_1['summary_date'])  
+
+    engine = create_engine('mysql+pymysql://root:{}@localhost:3306/Oura_Data'.format(env))
+    data6_1.to_sql(name='oura_activity', con=engine, schema='Oura_Data', if_exists='replace')
+
+
+if __name__ == "__main__":   
+    update_db()
