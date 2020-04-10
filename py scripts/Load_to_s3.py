@@ -30,7 +30,7 @@ def upload_file(file_name, bucket, object_name=None):
 
 
 def insert_data():
-    upload_file("/Users/jthompson/dev/airflow_home/data/f'{filename}'.json", 'ouraringbackupdata', 'Oura_Data')
+    upload_file("/Users/jthompson/dev/airflow_home/data/oura_*", 'ouraringbackupdata', 'Oura_Data')
 
 
 default_args = {

@@ -1,0 +1,26 @@
+#from datetime import timedelta, datetime
+from sqlalchemy import create_engine
+import pandas as pd
+import os
+
+
+def update_db():
+
+    '''
+    Load Oura Trend Data (sleep, activity, and readiness)
+    '''
+    
+    df = pd.read_csv('/Users/jthompson/dev/airflow_home/data/oura_2019-09-17_2020-04-01_trends.csv')
+    '''
+    Transform data and insert into postgre DB
+    '''
+    df['Bedtime Start'] = pd.to_datetime(df['Bedtime Start'], utc=True)
+
+    df['Bedtime End'] = pd.to_datetime(df['Bedtime End'], utc=True)
+
+    engine = create_engine('postgresql+psycopg2://jthompson:@localhost:5432/jthompson')
+    df.to_sql(name='oura_trends', con=engine, schema='oura_data', if_exists='replace')
+
+
+if __name__ == "__main__":   
+    update_db()
